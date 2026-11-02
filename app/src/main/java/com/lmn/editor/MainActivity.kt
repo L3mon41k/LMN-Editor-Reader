@@ -101,6 +101,31 @@ class MainActivity : Activity() {
         showTools("selection")
     }
 
+private fun makeButton(
+    text: String,
+    action: () -> Unit
+): Button {
+    return Button(this).apply {
+        this.text = text
+        textSize = 11f
+        isAllCaps = false
+        setOnClickListener { action() }
+    }
+}
+
+private fun menuButton(
+    text: String,
+    action: () -> Unit
+): Button {
+    return Button(this).apply {
+        this.text = text
+        textSize = 12f
+        isAllCaps = false
+        layoutParams = LinearLayout.LayoutParams(0, 58, 1f)
+        setOnClickListener { action() }
+    }
+}
+
 private fun showTools(section: String) {
     toolsPanel.removeAllViews()
 
@@ -127,15 +152,12 @@ private fun showTools(section: String) {
         row.addView(toolButton("Выделить всё") {
             editor.selectAll()
         })
-
         row.addView(toolButton("Копировать") {
             editor.copy()
         })
-
         row.addView(toolButton("Вырезать") {
             editor.cut()
         })
-
         row.addView(toolButton("Вставить") {
             editor.paste()
         })
@@ -144,34 +166,18 @@ private fun showTools(section: String) {
     toolsPanel.addView(row)
 }
 
-    private fun menuButton(
-        text: String,
-        action: () -> Unit
-    ): Button {
-        return Button(this).apply {
-            this.text = text
-            textSize = 12f
-            isAllCaps = false
-            layoutParams = LinearLayout.LayoutParams(0, 58, 1f)
-            setOnClickListener { action() }
-        }
+private fun toolButton(
+    text: String,
+    action: () -> Unit
+): Button {
+    return Button(this).apply {
+        this.text = text
+        textSize = 11f
+        isAllCaps = false
+        minWidth = 0
+        setPadding(3, 0, 3, 0)
+        layoutParams = LinearLayout.LayoutParams(0, 48, 1f)
+        setOnClickListener { action() }
     }
-
-    private fun showTools(section: String) {
-        toolsPanel.removeAllViews()
-
-        val label = TextView(this).apply {
-            text = when (section) {
-                "selection" -> "Выделение"
-                "format" -> "Форматирование"
-                else -> "Шифр"
-            }
-            textSize = 14f
-            setTextColor(Color.DKGRAY)
-            gravity = Gravity.CENTER
-            setPadding(5, 5, 5, 8)
-        }
-
-        toolsPanel.addView(label)
-    }
+}
 }
