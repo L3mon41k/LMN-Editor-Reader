@@ -1,6 +1,9 @@
 package com.lmn.editor
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
@@ -146,9 +149,9 @@ class MainActivity : Activity() {
         when (section) {
             "selection" -> {
                 row.addView(toolButton("Всё") { editor.selectAll() })
-                row.addView(toolButton("Копировать") { editor.copy() })
-                row.addView(toolButton("Вырезать") { editor.cut() })
-                row.addView(toolButton("Вставить") { editor.paste() })
+                row.addView(toolButton("Копировать") { copySelection(false) })
+                row.addView(toolButton("Вырезать") { copySelection(true) })
+                row.addView(toolButton("Вставить") { pasteClipboard() })
             }
             "format" -> {
                 row.addView(toolButton("Жирный") { applySpan(StyleSpan(Typeface.BOLD)) })
@@ -164,6 +167,26 @@ class MainActivity : Activity() {
             }
         }
         toolsPanel.addView(scroll)
+    }
+
+    private fun copySelection(removeAfterCopy: Boolean) {
+        val start = editor.selectionStart.coerceAtLeast(0)
+        val end = editor.selectionEnd.coerceAtLeast(0)
+        if (start == end) { toast("Сначала выделите текст"); return }
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("LMN text", editor.text.substring(minOf(start, end), maxOf(start, end))))
+        if (removeAfterCopy) editor.text.delete(minOf(start, end), maxOf(start, end))
+        toast(if (removeAfterCopy) "Текст вырезан" else "Текст скопирован")
+    }
+
+    private fun pasteClipboard() {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val item = clipboard.primaryClip?.getItemAt(0)
+        val value = item?.coerceToText(this)?.toString() ?: ""
+        if (value.isEmpty()) { toast("Буфер обмена пуст"); return }
+        val start = editor.selectionStart.coerceAtLeast(0)
+        val end = editor.selectionEnd.coerceAtLeast(0)
+        editor.text.replace(minOf(start, end), maxOf(start, end), value)
     }
 
     private fun applySpan(span: Any) {
