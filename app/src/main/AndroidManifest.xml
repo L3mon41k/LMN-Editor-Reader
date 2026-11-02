@@ -3,7 +3,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="LMN Editor & Reader"
+        android:label="LMN Editor &amp; Reader"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
 
